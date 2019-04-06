@@ -1,0 +1,4 @@
+bazel-*
+.tags
+.tags.lock
+.tags.temp
