@@ -4,6 +4,7 @@ sh_binary(
     data = [
         "@helm//:allfiles",
         "@helm_osx//:allfiles",
+        "@helm_tiller//:allfiles",
     ],
 )
 

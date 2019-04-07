@@ -10,4 +10,7 @@ else
     exit 1
 fi
 
+HOME="$(pwd)"
+$BINARY init --client-only >/dev/null
+$BINARY plugin list | grep -qc tiller || $BINARY plugin install external/helm_tiller
 $BINARY $*
