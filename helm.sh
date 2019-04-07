@@ -6,7 +6,7 @@ if [ "$platform" == "Darwin" ]; then
 elif [ "$platform" == "Linux" ]; then
     BINARY=external/helm/linux-amd64/helm
 else
-    echo "Buildifier does not have a binary for $platform"
+    echo "Helm does not have a binary for $platform"
     exit 1
 fi
 

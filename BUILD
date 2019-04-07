@@ -6,6 +6,7 @@ sh_binary(
         "@helm_osx//:allfiles",
         "@helm_tiller//:allfiles",
     ],
+    visibility = ["//visibility:public"],
 )
 
 sh_test(
