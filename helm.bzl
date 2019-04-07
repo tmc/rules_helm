@@ -21,28 +21,38 @@ else
 fi
 """
 
+def helm_chart_installer_alt(name, release_name, chart, values_yaml):
+    native.sh_binary(
+        name = "install_" + name,
+        srcs = ["helm_install.sh"],
+        data = [chart, values_yaml, "@com_github_tmc_rules_helm//:helm"],
+        args = ["foo", "$(location @com_github_tmc_rules_helm//:helm)"],
+    )
+
 def helm_chart_installer(name, release_name, chart, values_yaml):
     native.genrule(
         name = name,
-        srcs = [chart, values_yaml],
+        srcs = ["@com_github_tmc_rules_helm//:runfiles_bash", chart, values_yaml],
         outs = ["runhelm.sh"],
         #executable = 1,
         #tools = ["@com_github_tmc_rules_helm//:helm"],
-        cmd = """cat <<EOF > $@
-set -x
-echo """ + chart + """
-external/com_github_tmc_rules_helm/helm.sh tiller run -- which helm
-external/com_github_tmc_rules_helm/helm.sh tiller run -- which helm list
-external/com_github_tmc_rules_helm/helm.sh tiller run -- helm init --client-only
-external/com_github_tmc_rules_helm/helm.sh tiller run -- helm help
-#external/com_github_tmc_rules_helm/helm.sh tiller run -- helm upgrade --install """ + release_name + """ \
-./$(location """ + chart + """) --values=$(location """ + values_yaml + """)
+        cmd = """
+cp $(location @com_github_tmc_rules_helm//:runfiles_bash) $@
+cat <<EOF >> $@
+export RUNFILES_LIB_DEBUG=1
 
+set -x
+export HELM=\$$(rlocation com_github_tmc_rules_helm/helm)
+echo \$$HELM
+PATH=\$$PATH:\$$(dirname \$$HELM)
+\$$HELM tiller run -- \$$HELM upgrade --install """ + release_name + """ \
+./$(location """ + chart + """) --values=$(location """ + values_yaml + """)
 EOF""",
     )
     native.sh_binary(
         name = "install_" + name,
         srcs = ["runhelm.sh"],
+        deps = ["@bazel_tools//tools/bash/runfiles"],
         data = [chart, values_yaml, "@com_github_tmc_rules_helm//:helm"],
-        args = ["foo", "$(location @com_github_tmc_rules_helm//:helm)"],
+        #args = ["$(location @com_github_tmc_rules_helm//:helm)"],
     )

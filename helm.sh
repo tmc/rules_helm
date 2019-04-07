@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
+rfloc="${1}"
+shift
+
+echo "${rfloc}"
+source "${rfloc}"
+echo $(rlocation helm_osx/:allfiles)
+
 platform=$(uname)
 if [ "$platform" == "Darwin" ]; then
     BINARY=external/helm_osx/darwin-amd64/helm
