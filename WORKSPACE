@@ -1,7 +1,8 @@
 workspace(name = "com_github_tmc_rules_helm")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 load(":repos.bzl", "helm_repositories")
+
 helm_repositories()
 
 http_file(
@@ -17,4 +18,3 @@ http_file(
     sha256 = "ceeedbd3ae0479dc2a5161e17adf7eccaba146b650b07063976df58bc37d7c44",
     urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildifier.osx"],
 )
-
