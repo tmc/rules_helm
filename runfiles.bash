@@ -1,6 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
 # --- begin runfiles.bash initialization ---
 # Copy-pasted from Bazel's Bash runfiles library (tools/bash/runfiles/runfiles.bash).
 set -euo pipefail
@@ -23,21 +20,3 @@ else
   exit 1
 fi
 # --- end runfiles.bash initialization ---
-#export RUNFILES_LIB_DEBUG=1
-
-platform=$(uname)
-if [ "$platform" == "Darwin" ]; then
-    BINARY=$(rlocation helm_osx/darwin-amd64/helm)
-elif [ "$platform" == "Linux" ]; then
-    BINARY=$(rlocation helm/linux-amd64/helm)
-else
-    echo "Helm does not have a binary for $platform"
-    exit 1
-fi
-
-export HELM_HOME="$(pwd)/.helm"
-$BINARY init --client-only >/dev/null
-export RUNFILES_LIB_DEBUG=1
-$BINARY plugin list | grep -qc tiller || $BINARY plugin install $(dirname $(rlocation __main__/external/helm_tiller/WORKSPACE))
-
-$BINARY $*

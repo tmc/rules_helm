@@ -1,64 +1,47 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-RUNFILES_LIB = """
-# Copy-pasted from Bazel's Bash runfiles library (tools/bash/runfiles/runfiles.bash).
-set -euo pipefail
-if [[ ! -d "${RUNFILES_DIR:-/dev/null}" && ! -f "${RUNFILES_MANIFEST_FILE:-/dev/null}" ]]; then
-  if [[ -f "$0.runfiles_manifest" ]]; then
-    export RUNFILES_MANIFEST_FILE="$0.runfiles_manifest"
-  elif [[ -f "$0.runfiles/MANIFEST" ]]; then
-    export RUNFILES_MANIFEST_FILE="$0.runfiles/MANIFEST"
-  elif [[ -f "$0.runfiles/bazel_tools/tools/bash/runfiles/runfiles.bash" ]]; then
-    export RUNFILES_DIR="$0.runfiles"
-  fi
-fi
-if [[ -f "${RUNFILES_DIR:-/dev/null}/bazel_tools/tools/bash/runfiles/runfiles.bash" ]]; then
-  source "${RUNFILES_DIR}/bazel_tools/tools/bash/runfiles/runfiles.bash"
-elif [[ -f "${RUNFILES_MANIFEST_FILE:-/dev/null}" ]]; then
-  source "$(grep -m1 "^bazel_tools/tools/bash/runfiles/runfiles.bash " \
-            "$RUNFILES_MANIFEST_FILE" | cut -d ' ' -f 2-)"
-else
-  echo >&2 "ERROR: cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash"
-  exit 1
-fi
-"""
-
-def helm_chart_installer_alt(name, release_name, chart, values_yaml):
-    native.sh_binary(
-        name = "install_" + name,
-        srcs = ["helm_install.sh"],
-        data = [chart, values_yaml, "@com_github_tmc_rules_helm//:helm"],
-        args = ["foo", "$(location @com_github_tmc_rules_helm//:helm)"],
-    )
-
 def helm_chart_installer(name, release_name, chart, values_yaml):
+    # Unclear why we need this genrule to expose the chart tarball.
+    tarball_name = name + "_chart.tar.gz"
+    native.genrule(
+        name = name + "_chart",
+        outs = [tarball_name],
+        srcs = [chart],
+        cmd = "cp $(location " + chart + ") $@",
+    )
     native.genrule(
         name = name,
-        srcs = ["@com_github_tmc_rules_helm//:runfiles_bash", chart, values_yaml],
-        outs = ["runhelm.sh"],
-        #executable = 1,
-        #tools = ["@com_github_tmc_rules_helm//:helm"],
+        srcs = ["@com_github_tmc_rules_helm//:runfiles_bash", tarball_name, values_yaml],
+        outs = ["run_helm_cmd.sh"],
         cmd = """
-cp $(location @com_github_tmc_rules_helm//:runfiles_bash) $@
+echo "#!/bin/bash" > $@
+cat $(location @com_github_tmc_rules_helm//:runfiles_bash) >> $@
 cat <<EOF >> $@
 #export RUNFILES_LIB_DEBUG=1
 
 export HELM=\$$(rlocation com_github_tmc_rules_helm/helm)
-echo \$$HELM
 PATH=\$$PATH:\$$(dirname \$$HELM)
-echo CHARTLOCATION:
-export CHARTLOC=\$$(rlocation """ + paths.normalize(chart) + """)
-#echo \$$1
-#export CHARTLOC=./\$$1
-export CHARTLOC=$(location """ + paths.normalize(chart) + """)
+export CHARTLOC=\$$(rlocation __main__/""" + tarball_name + """)
 
-\$$HELM tiller run -- \$$HELM upgrade --install """ + release_name + """ ./\$$CHARTLOC --values=$(location """ + values_yaml + """)
+if [ "\$$1" == "upgrade" ]; then
+    helm tiller run default -- helm \$$@ """ + release_name + """ \$$CHARTLOC --values=$(location """ + values_yaml + """)
+else
+    helm tiller run default -- helm \$$@ """ + release_name + """
+fi
+
 EOF""",
     )
     native.sh_binary(
-        name = "install_" + name,
-        srcs = ["runhelm.sh"],
+        name = name + ".install",
+        srcs = ["run_helm_cmd.sh"],
         deps = ["@bazel_tools//tools/bash/runfiles"],
-        data = [chart, values_yaml, "@com_github_tmc_rules_helm//:helm"],
-        args = ["$(location "+chart+")"],
+        data = [tarball_name, values_yaml, "@com_github_tmc_rules_helm//:helm"],
+        args = ["upgrade", "--install"],
+    )
+    native.sh_binary(
+        name = name + ".delete",
+        srcs = ["run_helm_cmd.sh"],
+        deps = ["@bazel_tools//tools/bash/runfiles"],
+        data = [tarball_name, "@com_github_tmc_rules_helm//:helm"],
+        args = ["delete", "--purge"],
     )
