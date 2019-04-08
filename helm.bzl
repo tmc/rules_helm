@@ -1,10 +1,11 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-def helm_chart_installer(name, release_name, chart, values_yaml):
+def helm_chart(name, release_name, chart, values_yaml):
     # Unclear why we need this genrule to expose the chart tarball.
     tarball_name = name + "_chart.tar.gz"
+    helm_cmd_name = name + "_run_helm_cmd.sh"
     native.genrule(
-        name = name + "_chart",
+        name = name + "_tarball",
         outs = [tarball_name],
         srcs = [chart],
         cmd = "cp $(location " + chart + ") $@",
@@ -12,7 +13,7 @@ def helm_chart_installer(name, release_name, chart, values_yaml):
     native.genrule(
         name = name,
         srcs = ["@com_github_tmc_rules_helm//:runfiles_bash", tarball_name, values_yaml],
-        outs = ["run_helm_cmd.sh"],
+        outs = [helm_cmd_name],
         cmd = """
 echo "#!/bin/bash" > $@
 cat $(location @com_github_tmc_rules_helm//:runfiles_bash) >> $@
@@ -33,14 +34,14 @@ EOF""",
     )
     native.sh_binary(
         name = name + ".install",
-        srcs = ["run_helm_cmd.sh"],
+        srcs = [helm_cmd_name],
         deps = ["@bazel_tools//tools/bash/runfiles"],
         data = [tarball_name, values_yaml, "@com_github_tmc_rules_helm//:helm"],
         args = ["upgrade", "--install"],
     )
     native.sh_binary(
         name = name + ".delete",
-        srcs = ["run_helm_cmd.sh"],
+        srcs = [helm_cmd_name],
         deps = ["@bazel_tools//tools/bash/runfiles"],
         data = [tarball_name, "@com_github_tmc_rules_helm//:helm"],
         args = ["delete", "--purge"],

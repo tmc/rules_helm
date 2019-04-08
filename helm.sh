@@ -37,7 +37,6 @@ fi
 
 export HELM_HOME="$(pwd)/.helm"
 $BINARY init --client-only >/dev/null
-export RUNFILES_LIB_DEBUG=1
 $BINARY plugin list | grep -qc tiller || $BINARY plugin install $(dirname $(rlocation __main__/external/helm_tiller/WORKSPACE))
 
 $BINARY $*
