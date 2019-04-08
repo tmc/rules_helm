@@ -1,3 +1,5 @@
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
 RUNFILES_LIB = """
 # Copy-pasted from Bazel's Bash runfiles library (tools/bash/runfiles/runfiles.bash).
 set -euo pipefail
@@ -39,14 +41,18 @@ def helm_chart_installer(name, release_name, chart, values_yaml):
         cmd = """
 cp $(location @com_github_tmc_rules_helm//:runfiles_bash) $@
 cat <<EOF >> $@
-export RUNFILES_LIB_DEBUG=1
+#export RUNFILES_LIB_DEBUG=1
 
-set -x
 export HELM=\$$(rlocation com_github_tmc_rules_helm/helm)
 echo \$$HELM
 PATH=\$$PATH:\$$(dirname \$$HELM)
-\$$HELM tiller run -- \$$HELM upgrade --install """ + release_name + """ \
-./$(location """ + chart + """) --values=$(location """ + values_yaml + """)
+echo CHARTLOCATION:
+export CHARTLOC=\$$(rlocation """ + paths.normalize(chart) + """)
+#echo \$$1
+#export CHARTLOC=./\$$1
+export CHARTLOC=$(location """ + paths.normalize(chart) + """)
+
+\$$HELM tiller run -- \$$HELM upgrade --install """ + release_name + """ ./\$$CHARTLOC --values=$(location """ + values_yaml + """)
 EOF""",
     )
     native.sh_binary(
@@ -54,5 +60,5 @@ EOF""",
         srcs = ["runhelm.sh"],
         deps = ["@bazel_tools//tools/bash/runfiles"],
         data = [chart, values_yaml, "@com_github_tmc_rules_helm//:helm"],
-        #args = ["$(location @com_github_tmc_rules_helm//:helm)"],
+        args = ["$(location "+chart+")"],
     )

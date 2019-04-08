@@ -2,13 +2,13 @@ sh_binary(
     name = "helm",
     srcs = ["helm.sh"],
     data = [
-        "@helm//:allfiles",
-        "@helm_osx//:allfiles",
         "@helm_tiller//:allfiles",
-        ":runfiles_bash",
-    ],
-    args = ["$(location :runfiles_bash)"],
+    ] + select({
+        "@bazel_tools//src/conditions:linux_x86_64": ["@helm//:allfiles"],
+        "@bazel_tools//src/conditions:darwin": ["@helm_osx//:allfiles"],
+    }),
     visibility = ["//visibility:public"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
 )
 
 sh_library(
