@@ -36,7 +36,13 @@ else
 fi
 
 export HELM_HOME="$(pwd)/.helm"
-$BINARY init --client-only >/dev/null
-$BINARY plugin list | grep -qc tiller || $BINARY plugin install $(dirname $(rlocation __main__/external/helm_tiller/WORKSPACE))
+export PATH="$(dirname $BINARY):$PATH"
+#export HELM_TILLER_SILENT=true
+helm init --client-only >/dev/null
+# Remove local repo to increase reproducibility and remove errors
+helm repo list |grep -qc local && $BINARY repo remove local >/dev/null
 
-$BINARY $*
+helm plugin list | grep -qc tiller || $BINARY plugin install $(dirname $(rlocation __main__/external/helm_tiller/WORKSPACE))
+
+cd "${BUILD_WORKING_DIRECTORY:-}"
+helm $*
