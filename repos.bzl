@@ -28,7 +28,7 @@ def helm_repositories():
     new_git_repository(
         name = "helm_tiller",
         remote = "https://github.com/rimusz/helm-tiller",
-        commit = "3e715983bfd23c33d12b9c87d325ec5490b0ed6e",
+        commit = "a77f505e062d8337e8fd638796bfecc8a4a00bcc",
         shallow_since = "1553679518 +0000",
         build_file = "@com_github_tmc_rules_helm//:helm.BUILD",
     )
