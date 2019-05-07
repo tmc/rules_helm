@@ -51,7 +51,10 @@ mv *tgz $@
     )
 
 def helm_cmd(cmd, args, name, helm_cmd_name, tarball_name, values_yaml):
-    native.sh_binary(
+    nativecmd = native.sh_binary
+    if cmd == "test":
+        nativecmd = native.sh_test
+    nativecmd(
         name = name + "." + cmd,
         srcs = [helm_cmd_name],
         deps = ["@bazel_tools//tools/bash/runfiles"],
@@ -84,8 +87,6 @@ export CHARTLOC=\$$(rlocation __main__/""" + tarball_name + """)
 export NS=\$${NAMESPACE:-\$${BUILD_USER}}
 if [ "\$$1" == "upgrade" ]; then
     helm tiller run \$$NS -- helm \$$@ --namespace \$$NS """ + release_name + """ \$$CHARTLOC --values=$(location """ + values_yaml + """)
-elif [ "\$$1" == "test" ]; then
-    helm tiller run \$$NS -- helm test --cleanup """ + release_name + """
 else
     helm tiller run \$$NS -- helm \$$@ """ + release_name + """
 fi
