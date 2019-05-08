@@ -14,7 +14,7 @@ export HELM=\$$(rlocation com_github_tmc_rules_helm/helm)
 PATH=\$$(dirname \$$HELM):\$$PATH
 """
 
-def helm_chart(name, srcs):
+def helm_chart(name, srcs, update_deps=False):
     filegroup_name = name + "_filegroup"
     tarball_name = name + "_chart.tar.gz"
     helm_cmd_name = name + "_package.sh"
@@ -26,6 +26,9 @@ def helm_chart(name, srcs):
     #    #package_dir = ".",
     #    strip_prefix = ".",
     #)
+    package_flags = ""
+    if update_deps:
+        package_flags = "-u"
     native.filegroup(
         name = filegroup_name,
         srcs = srcs,
@@ -34,7 +37,7 @@ def helm_chart(name, srcs):
         name = name,
         #srcs = ["@com_github_tmc_rules_helm//:runfiles_bash", filegroup_name, "@bazel_tools//tools/bash/runfiles"],
         srcs = [filegroup_name],
-        outs = ["file"],
+        outs = ["%s_chart" % name],
         tools = ["@com_github_tmc_rules_helm//:helm"],
         cmd = """
 # find Chart.yaml in the filegroup
@@ -45,9 +48,11 @@ for s in $(SRCS); do
     break
   fi
 done
-$(location @com_github_tmc_rules_helm//:helm) package -u $$CHARTLOC
+$(location @com_github_tmc_rules_helm//:helm) package {package_flags} $$CHARTLOC
 mv *tgz $@
-"""
+""".format(
+    package_flags=package_flags,
+)
     )
 
 def helm_cmd(cmd, args, name, helm_cmd_name, tarball_name, values_yaml):
