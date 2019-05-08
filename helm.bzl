@@ -64,7 +64,7 @@ def helm_cmd(cmd, args, name, helm_cmd_name, tarball_name, values_yaml):
         args = args,
     )
 
-def helm_release(name, release_name, chart, values_yaml):
+def helm_release(name, release_name, chart, values_yaml, namespace=""):
     # Unclear why we need this genrule to expose the chart tarball.
     tarball_name = name + "_chart.tar.gz"
     helm_cmd_name = name + "_run_helm_cmd.sh"
@@ -86,6 +86,8 @@ def helm_release(name, release_name, chart, values_yaml):
         cmd =  HELM_CMD_PREFIX + """
 export CHARTLOC=\$$(rlocation __main__/""" + tarball_name + """)
 
+EXPLICIT_NAMESPACE=""" + namespace + """
+NAMESPACE=\$${EXPLICIT_NAMESPACE:-\$$NAMESPACE}
 export NS=\$${NAMESPACE:-\$${BUILD_USER}}
 if [ "\$$1" == "upgrade" ]; then
     helm tiller run \$$NS -- helm \$$@ --namespace \$$NS """ + release_name + """ \$$CHARTLOC --values=$(location """ + values_yaml + """)
