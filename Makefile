@@ -6,7 +6,12 @@ CACHEDIR ?= .cache
 IMAGE ?= $(shell basename $(shell pwd))
 
 .PHONY: all
-all: ci
+all: docs ci
+
+.PHONY: docs
+docs: deps
+	bazel build //:docs && cp bazel-bin/docs.md .
+	@chmod +w docs.md
 
 .PHONY: deps
 ifeq ($(UNAME),Darwin)

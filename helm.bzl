@@ -1,5 +1,4 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 
 HELM_CMD_PREFIX = """
 echo "#!/bin/bash" > $@
@@ -14,11 +13,20 @@ PATH=\$$(dirname \$$HELM):\$$PATH
 """
 
 def helm_chart(name, srcs, update_deps = False):
+    """Defines a helm chart (directory containing a Chart.yaml).
+
+    Args:
+        name: A unique name for this rule.
+        srcs: Source files to include as the helm chart. Typically this will just be glob(["**"]).
+        update_deps: Whether or not to run a helm dependency update prior to packaging.
+    """
+    format: The format to write the Rat check report in.
+    visibility: The visibility of this rule.
     filegroup_name = name + "_filegroup"
     helm_cmd_name = name + "_package.sh"
     package_flags = ""
     if update_deps:
-        package_flags = "-u"
+        package_flags = "--dependency-update"
     native.filegroup(
         name = filegroup_name,
         srcs = srcs,
@@ -45,7 +53,7 @@ mv *tgz $@
         ),
     )
 
-def helm_cmd(cmd, args, name, helm_cmd_name, values_yaml):
+def _helm_cmd(cmd, args, name, helm_cmd_name, values_yaml):
     native.sh_binary(
         name = name + "." + cmd,
         srcs = [helm_cmd_name],
@@ -55,6 +63,24 @@ def helm_cmd(cmd, args, name, helm_cmd_name, values_yaml):
     )
 
 def helm_release(name, release_name, chart, values_yaml, namespace = ""):
+    """Defines a helm release.
+
+    A given target has the following executable targets generated:
+
+    `(target_name).install`
+    `(target_name).install.wait`
+    `(target_name).status`
+    `(target_name).delete`
+    `(target_name).test`
+    `(target_name).test.noclean`
+
+    Args:
+        name: A unique name for this rule.
+        release_name: name of the release.
+        chart: The chart defined by helm_chart.
+        values_yaml: The values.yaml file to supply to the release.
+        namespace: The namespace to install the release into. If empty will default the NAMESPACE environment variable and will fall back the the current username (via BUILD_USER).
+    """
     helm_cmd_name = name + "_run_helm_cmd.sh"
     native.genrule(
         name = name,
@@ -76,9 +102,9 @@ fi
 
 EOF""",
     )
-    helm_cmd("install", ["upgrade", "--install"], name, helm_cmd_name, values_yaml)
-    helm_cmd("install.wait", ["upgrade", "--install", "--wait"], name, helm_cmd_name, values_yaml)
-    helm_cmd("status", ["status"], name, helm_cmd_name, values_yaml)
-    helm_cmd("delete", ["delete", "--purge"], name, helm_cmd_name, values_yaml)
-    helm_cmd("test", ["test", "--cleanup"], name, helm_cmd_name, values_yaml)
-    helm_cmd("test.noclean", ["test"], name, helm_cmd_name, values_yaml)
+    _helm_cmd("install", ["upgrade", "--install"], name, helm_cmd_name, values_yaml)
+    _helm_cmd("install.wait", ["upgrade", "--install", "--wait"], name, helm_cmd_name, values_yaml)
+    _helm_cmd("status", ["status"], name, helm_cmd_name, values_yaml)
+    _helm_cmd("delete", ["delete", "--purge"], name, helm_cmd_name, values_yaml)
+    _helm_cmd("test", ["test", "--cleanup"], name, helm_cmd_name, values_yaml)
+    _helm_cmd("test.noclean", ["test"], name, helm_cmd_name, values_yaml)
