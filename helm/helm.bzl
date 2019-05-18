@@ -91,11 +91,9 @@ EXPLICIT_NAMESPACE=""" + namespace + """
 NAMESPACE=\$${EXPLICIT_NAMESPACE:-\$$NAMESPACE}
 export NS=\$${NAMESPACE:-\$${BUILD_USER}}
 if [ "\$$1" == "upgrade" ]; then
-    helm tiller run \$$NS -- helm \$$@ --namespace \$$NS """ + release_name + """ \$$CHARTLOC --values=$(location """ + values_yaml + """)
-elif [ "\$$1" == "test" ]; then
-    helm tiller run \$$NS -- helm test --cleanup """ + release_name + """
+    helm \$$@ --namespace \$$NS """ + release_name + """ \$$CHARTLOC --values=$(location """ + values_yaml + """)
 else
-    helm tiller run \$$NS -- helm \$$@ """ + release_name + """
+    helm \$$@ --namespace \$$NS """ + release_name + """
 fi
 
 EOF""",
@@ -103,6 +101,6 @@ EOF""",
     _helm_cmd("install", ["upgrade", "--install"], name, helm_cmd_name, values_yaml)
     _helm_cmd("install.wait", ["upgrade", "--install", "--wait"], name, helm_cmd_name, values_yaml)
     _helm_cmd("status", ["status"], name, helm_cmd_name, values_yaml)
-    _helm_cmd("delete", ["delete", "--purge"], name, helm_cmd_name, values_yaml)
-    _helm_cmd("test", ["test", "--cleanup"], name, helm_cmd_name, values_yaml)
-    _helm_cmd("test.noclean", ["test"], name, helm_cmd_name, values_yaml)
+    _helm_cmd("delete", ["delete"], name, helm_cmd_name, values_yaml)
+    _helm_cmd("test", ["test", "run", "--cleanup"], name, helm_cmd_name, values_yaml)
+    _helm_cmd("test.noclean", ["test", "run"], name, helm_cmd_name, values_yaml)

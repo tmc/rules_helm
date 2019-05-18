@@ -1,9 +1,7 @@
 sh_binary(
     name = "helm",
     srcs = ["helm.sh"],
-    data = [
-        "@helm_tiller//:allfiles",
-    ] + select({
+    data = select({
         "@bazel_tools//src/conditions:linux_x86_64": ["@helm//:allfiles"],
         "@bazel_tools//src/conditions:darwin": ["@helm_osx//:allfiles"],
     }),

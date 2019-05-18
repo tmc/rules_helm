@@ -3,7 +3,6 @@ set -euo pipefail
 
 # --- begin runfiles.bash initialization ---
 # Copy-pasted from Bazel's Bash runfiles library (tools/bash/runfiles/runfiles.bash).
-set -euo pipefail
 if [[ ! -d "${RUNFILES_DIR:-/dev/null}" && ! -f "${RUNFILES_MANIFEST_FILE:-/dev/null}" ]]; then
   if [[ -f "$0.runfiles_manifest" ]]; then
     export RUNFILES_MANIFEST_FILE="$0.runfiles_manifest"
@@ -37,12 +36,7 @@ fi
 
 export HELM_HOME="$(pwd)/.helm"
 export PATH="$(dirname $BINARY):$PATH"
-#export HELM_TILLER_SILENT=true
-helm init --client-only >/dev/null
-# Remove local repo to increase reproducibility and remove errors
-helm repo list |grep -qc local && $BINARY repo remove local >/dev/null
-
-helm plugin list | grep -qc tiller || $BINARY plugin install $(dirname $(rlocation __main__/external/helm_tiller/WORKSPACE))
+helm init >/dev/null
 
 cd "${BUILD_WORKING_DIRECTORY:-}"
 helm $*

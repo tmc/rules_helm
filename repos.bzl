@@ -12,23 +12,15 @@ def helm_repositories():
 
     http_archive(
         name = "helm",
-        sha256 = "c1967c1dfcd6c921694b80ededdb9bd1beb27cb076864e58957b1568bc98925a",
-        urls = ["https://storage.googleapis.com/kubernetes-helm/helm-v2.13.1-linux-amd64.tar.gz"],
+        sha256 = "12632bdf85144d8883de07d257f892f447a8bccc84de82276e111059ac8437b1",
+        urls = ["https://get.helm.sh/helm-v3.0.0-alpha.1-linux-amd64.tar.gz"],
         build_file = "@com_github_tmc_rules_helm//:helm.BUILD",
         #
     )
 
     http_archive(
         name = "helm_osx",
-        sha256 = "c9564c4133349b98a8c1dda42fdb6545f6e4bfdf0980cdfc38cf76d2f8e5e701",
-        urls = ["https://storage.googleapis.com/kubernetes-helm/helm-v2.13.1-darwin-amd64.tar.gz"],
-        build_file = "@com_github_tmc_rules_helm//:helm.BUILD",
-    )
-
-    new_git_repository(
-        name = "helm_tiller",
-        remote = "https://github.com/rimusz/helm-tiller",
-        commit = "a77f505e062d8337e8fd638796bfecc8a4a00bcc",
-        shallow_since = "1553679518 +0000",
+        sha256 = "f562e5bbb5b8b8a6a46c080970c1fea35ff908a1402f56e5d4c8f327c9ff4835",
+        urls = ["https://get.helm.sh/helm-v3.0.0-alpha.1-darwin-amd64.tar.gz"],
         build_file = "@com_github_tmc_rules_helm//:helm.BUILD",
     )
