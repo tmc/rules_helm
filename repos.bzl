@@ -12,16 +12,16 @@ def helm_repositories():
 
     http_archive(
         name = "helm",
-        sha256 = "c1967c1dfcd6c921694b80ededdb9bd1beb27cb076864e58957b1568bc98925a",
-        urls = ["https://storage.googleapis.com/kubernetes-helm/helm-v2.13.1-linux-amd64.tar.gz"],
+        sha256 = "b5f6a1e642971af1363cadbe1f7f37c029c11dd93813151b521c0dbeacfbdaa9",
+        urls = ["https://storage.googleapis.com/kubernetes-helm/helm-v2.14.0-linux-amd64.tar.gz"],
         build_file = "@com_github_tmc_rules_helm//:helm.BUILD",
         #
     )
 
     http_archive(
         name = "helm_osx",
-        sha256 = "c9564c4133349b98a8c1dda42fdb6545f6e4bfdf0980cdfc38cf76d2f8e5e701",
-        urls = ["https://storage.googleapis.com/kubernetes-helm/helm-v2.13.1-darwin-amd64.tar.gz"],
+        sha256 = "92ae686de2dc74783aebfb0b7f1a95ebf2b3b62814c37adae2b2e7fa9cc92ceb",
+        urls = ["https://storage.googleapis.com/kubernetes-helm/helm-v2.14.0-darwin-amd64.tar.gz"],
         build_file = "@com_github_tmc_rules_helm//:helm.BUILD",
     )
 
