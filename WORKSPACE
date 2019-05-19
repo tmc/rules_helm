@@ -4,7 +4,7 @@ load(":repos.bzl", "helm_repositories")
 
 helm_repositories()
 
-load(":buildifier.bzl", "buildifier_repositories")
+load("//tools:buildifier.bzl", "buildifier_repositories")
 buildifier_repositories()
 
 # Start stardoc rules

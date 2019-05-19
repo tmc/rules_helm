@@ -20,8 +20,6 @@ def helm_chart(name, srcs, update_deps = False):
         srcs: Source files to include as the helm chart. Typically this will just be glob(["**"]).
         update_deps: Whether or not to run a helm dependency update prior to packaging.
     """
-    format: The format to write the Rat check report in.
-    visibility: The visibility of this rule.
     filegroup_name = name + "_filegroup"
     helm_cmd_name = name + "_package.sh"
     package_flags = ""

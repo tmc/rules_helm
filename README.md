@@ -10,7 +10,7 @@ This allows you to describe Kubernetes applications in a deterministic manner.
 
 ## Documentation
 
-* See [Rule and macro defintions](./docs.md) for macro documentation.
+* See [Rule and macro defintions](./docs/docs.md) for macro documentation.
 
 ### API
 
@@ -24,7 +24,7 @@ In your Bazel `WORKSPACE` file add this repository as a dependency:
 ```
 git_repository(
     name = "com_github_tmc_rules_helm",
-    tag = "0.1.0",
+    tag = "0.2.0",
     remote = "https://github.com/tmc/rules_helm.git",
 )
 ```

@@ -24,31 +24,3 @@ sh_test(
         ".dummy_test.sh",
     ],
 )
-
-load("@io_bazel_skydoc//stardoc:stardoc.bzl", "stardoc")
-load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-
-# package(default_visibility = ["//visibility:public"])
-package(default_visibility = ["//visibility:public"])
-
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-
-bzl_library(
-
-    name = "skylib_paths",
-    srcs = ["@bazel_skylib//lib:paths.bzl"],
-)
-# bzl_library(
-#     name = "bazel_tools_pkg",
-#     srcs = ["@bazel_tools//tools:srcs"],
-# )
-
-stardoc(
-    name = "docs",
-    out = "docs.md",
-    input = "helm.bzl",
-    deps = [
-        ":skylib_paths",
-        # ":bazel_tools_pkg",
-    ],
-)
