@@ -31,7 +31,6 @@ def helm_chart(name, srcs, update_deps = False):
     )
     native.genrule(
         name = name,
-        #srcs = ["@com_github_tmc_rules_helm//:runfiles_bash", filegroup_name, "@bazel_tools//tools/bash/runfiles"],
         srcs = [filegroup_name],
         outs = ["%s_chart.tar.gz" % name],
         tools = ["@com_github_tmc_rules_helm//:helm"],
