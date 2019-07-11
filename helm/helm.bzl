@@ -1,7 +1,7 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 HELM_CMD_PREFIX = """
-echo "#!/bin/bash" > $@
+echo "#!/usr/bin/env bash" > $@
 cat $(location @com_github_tmc_rules_helm//:runfiles_bash) >> $@
 echo "export NAMESPACE=$$(grep NAMESPACE bazel-out/stable-status.txt | cut -d ' ' -f 2)" >> $@
 echo "export BUILD_USER=$$(grep BUILD_USER bazel-out/stable-status.txt | cut -d ' ' -f 2)" >> $@
