@@ -54,7 +54,7 @@ Defines a helm chart (directory containing a Chart.yaml).
 ## helm_release
 
 <pre>
-helm_release(<a href="#helm_release-name">name</a>, <a href="#helm_release-release_name">release_name</a>, <a href="#helm_release-chart">chart</a>, <a href="#helm_release-values_yaml">values_yaml</a>, <a href="#helm_release-namespace">namespace</a>)
+helm_release(<a href="#helm_release-name">name</a>, <a href="#helm_release-release_name">release_name</a>, <a href="#helm_release-chart">chart</a>, <a href="#helm_release-values_yaml">values_yaml</a>, <a href="#helm_release-values">values</a>, <a href="#helm_release-namespace">namespace</a>)
 </pre>
 
 Defines a helm release.
@@ -107,9 +107,18 @@ A given target has the following executable targets generated:
     <tr id="helm_release-values_yaml">
       <td><code>values_yaml</code></td>
       <td>
-        required.
+        optional. default is <code>None</code>
         <p>
-          The values.yaml file to supply to the release.
+          The values.yaml file to supply for the release.
+        </p>
+      </td>
+    </tr>
+    <tr id="helm_release-values">
+      <td><code>values</code></td>
+      <td>
+        optional. default is <code>None</code>
+        <p>
+          A map of additional values to supply for the release.
         </p>
       </td>
     </tr>

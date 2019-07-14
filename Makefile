@@ -29,7 +29,7 @@ deps-darwin: deps-common
 
 .PHONY: deps-linux
 deps-linux: deps-common
-	apt-get install -y build-essential curl unzip
+	sudo apt-get install -y build-essential curl unzip
 
 
 .PHONY: deps-bazel
