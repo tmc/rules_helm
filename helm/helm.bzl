@@ -54,7 +54,7 @@ def _build_helm_set_args(values):
     set_args = ["--set=%s=%s" % (key, values[key]) for key in sorted((values or {}).keys())]
     return " ".join(set_args)
 
-def _helm_cmd(cmd, args, name, helm_cmd_name, values_yaml=None, values=None):
+def _helm_cmd(cmd, args, name, helm_cmd_name, values_yaml = None, values = None):
     binary_data = ["@com_github_tmc_rules_helm//:helm"]
     if values_yaml:
         binary_data.append(values_yaml)
@@ -69,7 +69,7 @@ def _helm_cmd(cmd, args, name, helm_cmd_name, values_yaml=None, values=None):
         args = args,
     )
 
-def helm_release(name, release_name, chart, values_yaml=None, values=None, namespace = ""):
+def helm_release(name, release_name, chart, values_yaml = None, values = None, namespace = ""):
     """Defines a helm release.
 
     A given target has the following executable targets generated:
@@ -96,7 +96,7 @@ def helm_release(name, release_name, chart, values_yaml=None, values=None, names
     set_params = _build_helm_set_args(values)
 
     # build --values param
-    values_param = ''
+    values_param = ""
     if values_yaml:
         values_param = "--values=$(location %s)" % values_yaml
         genrule_srcs.append(values_yaml)
