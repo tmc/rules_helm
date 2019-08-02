@@ -24,7 +24,7 @@ In your Bazel `WORKSPACE` file add this repository as a dependency:
 ```
 git_repository(
     name = "com_github_tmc_rules_helm",
-    tag = "0.3.0",
+    tag = "0.4.0",
     remote = "https://github.com/tmc/rules_helm.git",
 )
 ```
