@@ -42,7 +42,10 @@ helm init --client-only >/dev/null
 # Remove local repo to increase reproducibility and remove errors
 helm repo list |grep -qc local && $BINARY repo remove local >/dev/null
 
-helm plugin list | grep -qc tiller || $BINARY plugin install $(dirname $(rlocation __main__/external/helm_tiller/WORKSPACE))
+HELM_TILLER="$(rlocation helm_tiller)"
+HELM_TILLER=${HELM_TILLER:-external/helm_tiller}
+
+helm plugin list | grep -qc tiller || $BINARY plugin install "$HELM_TILLER"
 
 cd "${BUILD_WORKING_DIRECTORY:-}"
 helm $*
