@@ -45,4 +45,5 @@ helm repo list |grep -qc local && $BINARY repo remove local >/dev/null
 helm plugin list | grep -qc tiller || $BINARY plugin install $(dirname $(rlocation __main__/external/helm_tiller/WORKSPACE))
 
 cd "${BUILD_WORKING_DIRECTORY:-}"
+echo "helm $*"
 helm $*
