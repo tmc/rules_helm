@@ -79,7 +79,6 @@ def helm_release(name, release_name, chart, values_yaml = None, values = None, n
     `(target_name).status`
     `(target_name).delete`
     `(target_name).test`
-    `(target_name).test.noclean`
 
     Args:
         name: A unique name for this rule.
@@ -113,8 +112,6 @@ NAMESPACE=\$${EXPLICIT_NAMESPACE:-\$$NAMESPACE}
 export NS=\$${NAMESPACE:-\$${BUILD_USER}}
 if [ "\$$1" == "upgrade" ]; then
     helm \$$@ """ + release_name + " \$$CHARTLOC --namespace \$$NS " + set_params + " " + values_param + """
-elif [ "\$$1" == "test" ]; then
-    helm test --cleanup """ + release_name + " \$$CHARTLOC --namespace \$$NS " + """
 else
     helm \$$@ """ + release_name + " \$$CHARTLOC --namespace \$$NS " + """
 fi
@@ -124,6 +121,5 @@ EOF""",
     _helm_cmd("install", ["upgrade", "--install"], name, helm_cmd_name, values_yaml, values)
     _helm_cmd("install.wait", ["upgrade", "--install", "--wait"], name, helm_cmd_name, values_yaml, values)
     _helm_cmd("status", ["status"], name, helm_cmd_name)
-    _helm_cmd("delete", ["delete", "--purge"], name, helm_cmd_name)
-    _helm_cmd("test", ["test", "--cleanup"], name, helm_cmd_name)
-    _helm_cmd("test.noclean", ["test"], name, helm_cmd_name)
+    _helm_cmd("delete", ["delete"], name, helm_cmd_name)
+    _helm_cmd("test", ["test"], name, helm_cmd_name)

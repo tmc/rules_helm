@@ -61,7 +61,6 @@ helm_release(
 
 This defines targets you can now use to manage the release:
 ```
-:a_great_release.test.noclean
 :a_great_release.test
 :a_great_release.status
 :a_great_release.install.wait

@@ -66,7 +66,6 @@ A given target has the following executable targets generated:
 `(target_name).status`
 `(target_name).delete`
 `(target_name).test`
-`(target_name).test.noclean`
 
 
 ### Parameters
@@ -133,5 +132,3 @@ A given target has the following executable targets generated:
     </tr>
   </tbody>
 </table>
-
-
