@@ -1,4 +1,4 @@
-workspace(name = "com_github_tmc_rules_helm")
+workspace(name = "com_github_deviavir_rules_helm")
 
 load(":repos.bzl", "helm_repositories")
 

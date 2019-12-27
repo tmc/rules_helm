@@ -2,13 +2,13 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 
 HELM_CMD_PREFIX = """
 echo "#!/usr/bin/env bash" > $@
-cat $(location @com_github_tmc_rules_helm//:runfiles_bash) >> $@
+cat $(location @com_github_deviavir_rules_helm//:runfiles_bash) >> $@
 echo "export NAMESPACE=$$(grep NAMESPACE bazel-out/stable-status.txt | cut -d ' ' -f 2)" >> $@
 echo "export BUILD_USER=$$(grep BUILD_USER bazel-out/stable-status.txt | cut -d ' ' -f 2)" >> $@
 cat <<EOF >> $@
 #export RUNFILES_LIB_DEBUG=1 # For runfiles debugging
 
-export HELM=\$$(rlocation com_github_tmc_rules_helm/helm)
+export HELM=\$$(rlocation com_github_deviavir_rules_helm/helm)
 PATH=\$$(dirname \$$HELM):\$$PATH
 """
 
@@ -33,7 +33,7 @@ def helm_chart(name, srcs, update_deps = False):
         name = name,
         srcs = [filegroup_name],
         outs = ["%s_chart.tar.gz" % name],
-        tools = ["@com_github_tmc_rules_helm//:helm"],
+        tools = ["@com_github_deviavir_rules_helm//:helm"],
         cmd = """
 # find Chart.yaml in the filegroup
 CHARTLOC=missing
@@ -43,7 +43,7 @@ for s in $(SRCS); do
     break
   fi
 done
-$(location @com_github_tmc_rules_helm//:helm) package {package_flags} $$CHARTLOC
+$(location @com_github_deviavir_rules_helm//:helm) package {package_flags} $$CHARTLOC
 mv *tgz $@
 """.format(
             package_flags = package_flags,
@@ -55,7 +55,7 @@ def _build_helm_set_args(values):
     return " ".join(set_args)
 
 def _helm_cmd(cmd, args, name, helm_cmd_name, values_yaml = None, values = None):
-    binary_data = ["@com_github_tmc_rules_helm//:helm"]
+    binary_data = ["@com_github_deviavir_rules_helm//:helm"]
     if values_yaml:
         binary_data.append(values_yaml)
     if values:
@@ -90,7 +90,7 @@ def helm_release(name, release_name, chart, values_yaml = None, values = None, n
         namespace: The namespace to install the release into. If empty will default the NAMESPACE environment variable and will fall back the the current username (via BUILD_USER).
     """
     helm_cmd_name = name + "_run_helm_cmd.sh"
-    genrule_srcs = ["@com_github_tmc_rules_helm//:runfiles_bash", chart]
+    genrule_srcs = ["@com_github_deviavir_rules_helm//:runfiles_bash", chart]
 
     # build --set params
     set_params = _build_helm_set_args(values)
@@ -98,7 +98,7 @@ def helm_release(name, release_name, chart, values_yaml = None, values = None, n
     # build --values param
     values_param = ""
     if values_yaml:
-        values_param = "--values=$(location %s)" % values_yaml
+        values_param = "-f $(location %s)" % values_yaml
         genrule_srcs.append(values_yaml)
 
     native.genrule(
@@ -112,11 +112,11 @@ EXPLICIT_NAMESPACE=""" + namespace + """
 NAMESPACE=\$${EXPLICIT_NAMESPACE:-\$$NAMESPACE}
 export NS=\$${NAMESPACE:-\$${BUILD_USER}}
 if [ "\$$1" == "upgrade" ]; then
-    helm tiller run \$$NS -- helm \$$@ --namespace \$$NS """ + release_name + " " + set_params + " " + values_param + """ \$$CHARTLOC 
+    helm \$$@ """ + release_name + " \$$CHARTLOC --namespace \$$NS " + set_params + " " + values_param + """
 elif [ "\$$1" == "test" ]; then
-    helm tiller run \$$NS -- helm test --cleanup """ + release_name + """
+    helm test --cleanup """ + release_name + " \$$CHARTLOC --namespace \$$NS " + """
 else
-    helm tiller run \$$NS -- helm \$$@ """ + release_name + """
+    helm \$$@ """ + release_name + " \$$CHARTLOC --namespace \$$NS " + """
 fi
 
 EOF""",
