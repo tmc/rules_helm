@@ -113,7 +113,7 @@ export NS=\$${NAMESPACE:-\$${BUILD_USER}}
 if [ "\$$1" == "upgrade" ]; then
     helm \$$@ """ + release_name + " \$$CHARTLOC --namespace \$$NS " + set_params + " " + values_param + """
 else
-    helm \$$@ """ + release_name + " \$$CHARTLOC --namespace \$$NS " + """
+    helm \$$@ """ + release_name + " --namespace \$$NS " + """
 fi
 
 EOF""",
