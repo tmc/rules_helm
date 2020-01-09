@@ -48,6 +48,8 @@ mv *tgz $@
 """.format(
             package_flags = package_flags,
         ),
+        # Helm tries to fetch data from external services, which does not work with remote build execution.
+        tags = ["no-remote"]
     )
 
 def _build_helm_set_args(values):
