@@ -31,7 +31,7 @@ git_repository(
 
 Then in your `BUILD` files include the `helm_chart` and/or `helm_release` rules:
 
-`charts/a-great-chart/zBUILD`:
+`charts/a-great-chart/BUILD`:
 ```python
 load("@com_github_tmc_rules_helm//:helm.bzl", "helm_chart")
 
